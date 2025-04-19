@@ -1,0 +1,100 @@
+.container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Georgia', serif;
+}
+
+.title {
+  font-size: 2.5rem;
+  color: #2c3e50;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-weight: normal;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 1rem;
+}
+
+.pageContainer {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 4px;
+  margin: 1rem 0;
+  border: 1px solid #ecf0f1;
+}
+
+.pageTitle {
+  color: #34495e;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  font-weight: normal;
+}
+
+.pageContent {
+  line-height: 1.8;
+  font-size: 1.1rem;
+  color: #2c3e50;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 2px solid #ecf0f1;
+}
+
+.pageNumber {
+  font-size: 1.1rem;
+  color: #7f8c8d;
+  min-width: 3rem;
+  text-align: center;
+  font-style: italic;
+}
+
+.navButton {
+  background: #34495e;
+  color: white;
+  border: none;
+  padding: 0.8em 1.5em;
+  font-size: 1em;
+  transition: all 0.3s ease;
+  border-radius: 4px;
+  font-family: 'Georgia', serif;
+}
+
+.navButton:hover:not(:disabled) {
+  background: #2c3e50;
+}
+
+.navButton:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+}
+
+.loadingSpinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 1.5rem;
+  color: #34495e;
+  font-style: italic;
+}
+
+.error {
+  color: #e74c3c;
+  background: #fdf3f2;
+  padding: 1rem;
+  border-radius: 4px;
+  text-align: center;
+  margin: 2rem 0;
+  border: 1px solid #f9d6d3;
+}
