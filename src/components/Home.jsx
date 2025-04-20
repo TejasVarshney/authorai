@@ -1,11 +1,21 @@
 import { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import BookContext from "./BookContext";
-import { Link } from "react-router-dom";
 import styles from "./Home.module.css";
 
 export default function Home() {
     const [input, setInput] = useState('');
-    const [topic, setTopic] = useContext(BookContext);
+    const navigate = useNavigate();
+    const { setTopic, setBook } = useContext(BookContext);
+
+    const handleSubmit = (e) => {
+        e?.preventDefault();
+        if (!input.trim()) return;
+        
+        setTopic(input);
+        setBook(null);
+        navigate('/book');
+    };
 
     return (
         <div className={styles.container}>
@@ -13,29 +23,30 @@ export default function Home() {
             <p className={styles.description}>
                 Enter a topic and let AI create a unique story just for you
             </p>
-            <div className={styles.inputContainer}>
+            <form className={styles.inputContainer} onSubmit={handleSubmit}>
                 <input 
                     className={styles.input}
                     placeholder="Enter your story topic..."
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' && input.trim()) {
-                            setTopic(input);
-                            document.querySelector('.generate-button').click();
-                        }
-                    }}
                 />
-                <Link to="/book">
+                <div className={styles.buttonGroup}>
                     <button 
+                        type="submit"
                         className={styles.button}
-                        onClick={() => setTopic(input)}
                         disabled={!input.trim()}
                     >
                         Generate Book
                     </button>
-                </Link>
-            </div>
+                    <button 
+                        type="button"
+                        className={styles.button}
+                        onClick={() => navigate('/library')}
+                    >
+                        View Library
+                    </button>
+                </div>
+            </form>
         </div>
     );
 }

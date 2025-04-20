@@ -10,7 +10,6 @@
   font-size: 3.5rem;
   color: #2c3e50;
   margin-bottom: 1rem;
-  font-family: 'Georgia', serif;
   font-weight: normal;
 }
 
@@ -18,7 +17,6 @@
   font-size: 1.2rem;
   color: #34495e;
   margin-bottom: 3rem;
-  font-family: 'Georgia', serif;
   font-style: italic;
 }
 
@@ -39,11 +37,9 @@
   background: #fff;
   color: #2c3e50;
   transition: all 0.3s ease;
-  font-family: 'Georgia', serif;
 }
 
 .input:focus {
-  outline: none;
   border-color: #34495e;
   box-shadow: 0 0 5px rgba(52, 73, 94, 0.2);
 }
@@ -54,10 +50,6 @@
   font-size: 1.1rem;
   padding: 0.8rem 2rem;
   border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: 'Georgia', serif;
 }
 
 .button:hover:not(:disabled) {
@@ -68,6 +60,13 @@
 .button:disabled {
   background: #bdc3c7;
   cursor: not-allowed;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
 }
 
 @keyframes fadeIn {
