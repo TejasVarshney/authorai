@@ -10,12 +10,14 @@
   font-size: 3.5rem;
   margin-bottom: 1rem;
   font-weight: normal;
+  color: #92400e;
 }
 
 .description {
   font-size: 1.2rem;
   margin-bottom: 3rem;
   font-style: italic;
+  color: #92400e;
 }
 
 .inputContainer {
@@ -35,6 +37,8 @@
   width: 100%;
   padding: 1rem 1.5rem;
   font-size: 1.1rem;
+  background: #fff7ed;
+  border: 2px solid #f59e0b;
 }
 
 .charCount {
@@ -42,7 +46,7 @@
   right: 10px;
   bottom: -20px;
   font-size: 0.8rem;
-  color: #7f8c8d;
+  color: #92400e;
 }
 
 .button {
@@ -72,8 +76,20 @@
 }
 
 /* Dark mode overrides */
+:root[data-theme="dark"] .title,
+:root[data-theme="dark"] .description {
+  color: #ffffff;
+}
+
 :root[data-theme="dark"] .charCount {
-  color: #a0a0a0;
+  color: #ffffff;
+  opacity: 0.8;
+}
+
+:root[data-theme="dark"] .input {
+  background: #2d2d2d;
+  border-color: #d97706;
+  color: #ffffff;
 }
 
 @keyframes fadeIn {

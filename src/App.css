@@ -3,11 +3,11 @@
   line-height: 1.5;
   font-weight: 400;
   color: #2c3e50;
-  background-color: #f5f6fa;
+  background-color: #fffbeb;
 }
 
 :root[data-theme="dark"] {
-  color: #e0e0e0;
+  color: #ffffff;
   background-color: #1a1a1a;
 }
 
@@ -22,58 +22,61 @@ button {
   transition: all 0.3s ease;
   font-family: inherit;
   border: none;
-  background: #34495e;
+  background: #d97706;
   color: white;
   border-radius: 4px;
 }
 
 button:hover:not(:disabled) {
-  background: #2c3e50;
+  background: #b45309;
 }
 
 button:disabled {
-  background: #bdc3c7;
+  background: #fde68a;
   cursor: not-allowed;
+  color: #78350f;
 }
 
 input, select {
-  border: 2px solid #bdc3c7;
+  border: 2px solid #f59e0b;
   border-radius: 4px;
   font-family: inherit;
   transition: all 0.3s ease;
+  background-color: #fffbeb;
 }
 
 button:focus,
 button:focus-visible,
 input:focus,
 select:focus {
-  outline: 2px solid #34495e;
+  outline: 2px solid #d97706;
   outline-offset: 2px;
 }
 
 /* Dark mode global styles */
 :root[data-theme="dark"] button {
-  background: #34495e;
+  background: #d97706;
 }
 
 :root[data-theme="dark"] button:hover:not(:disabled) {
-  background: #2c3e50;
+  background: #b45309;
 }
 
 :root[data-theme="dark"] button:disabled {
   background: #404040;
+  color: #a0a0a0;
 }
 
 :root[data-theme="dark"] input,
 :root[data-theme="dark"] select {
   background: #2d2d2d;
-  border-color: #404040;
-  color: #e0e0e0;
+  border-color: #d97706;
+  color: #ffffff;
 }
 
 :root[data-theme="dark"] button:focus,
 :root[data-theme="dark"] button:focus-visible,
 :root[data-theme="dark"] input:focus,
 :root[data-theme="dark"] select:focus {
-  outline-color: #e0e0e0;
+  outline-color: #f59e0b;
 }
