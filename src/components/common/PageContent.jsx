@@ -15,7 +15,7 @@ export function PageContent({
             <div className={styles.pageContainer}>
                 {showChapterTitle && (
                     <h3 className={styles.pageTitle}>
-                        Chapter {book[currentPage].chapter_number}: {book[currentPage].title}
+                        Chapter {book[currentPage].chapter_number}: {book[currentPage].chapter_name}
                     </h3>
                 )}
                 <p 

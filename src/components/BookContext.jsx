@@ -35,7 +35,7 @@ export const BookProvider = ({children}) => {
         if (newBook && topic) {
             const bookEntry = {
                 id: Date.now(),
-                topic,
+                title: topic,
                 content: newBook,
                 dateAdded: new Date().toISOString()
             };

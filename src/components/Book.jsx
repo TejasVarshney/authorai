@@ -71,14 +71,15 @@ function Book() {
                 .then(data => {
                     const flattenedPages = data.chapters.flatMap(ch => 
                         ch.chapter.map(page => ({
-                            title: page.chapter_name,
+                            title: data.title,
+                            chapter_name: page.chapter_name,
                             chapter_number: page.chapter_number,
                             content: page.content,
                             page_number: page.page_number
                         }))
                     );
                     setBook(flattenedPages);
-                    addToLibrary(flattenedPages);
+                    addToLibrary({ ...flattenedPages[0], content: flattenedPages });
                 })
                 .catch(err => setError(err.message))
                 .finally(() => setIsLoading(false));
@@ -156,7 +157,7 @@ function Book() {
                 onChapterListToggle={() => setShowChapterList(!showChapterList)}
             />
 
-            <h1 className={styles.title}>{topic}</h1>
+            <h1 className={styles.title}>{book[0]?.title || topic}</h1>
             {readingTimeInfo && (
                 <div className={styles.readingTime}>
                     <span title="Total reading time">

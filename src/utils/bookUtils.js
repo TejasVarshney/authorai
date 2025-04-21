@@ -37,7 +37,7 @@ export function getUniqueChapters(book) {
         if (!uniqueChapters.has(page.chapter_number)) {
             uniqueChapters.set(page.chapter_number, {
                 number: page.chapter_number,
-                title: page.title
+                title: page.chapter_name
             });
         }
     });

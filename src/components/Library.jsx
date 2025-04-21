@@ -4,9 +4,10 @@ import BookContext from "./BookContext";
 import styles from "./Library.module.css";
 
 function BookCard({ book, onRead, onDelete }) {
+    const displayTitle = book.content[0]?.title || book.title || book.topic;
     return (
         <div className={styles.book}>
-            <h2 className={styles.bookTitle}>{book.topic}</h2>
+            <h2 className={styles.bookTitle}>{displayTitle}</h2>
             <p className={styles.bookInfo}>
                 {book.content ? `${book.content.length} pages • ` : ''}{new Date(book.dateAdded).toLocaleDateString()}
             </p>
@@ -38,25 +39,27 @@ export default function Library() {
     const [sortOrder, setSortOrder] = useState('desc');
 
     const handleReadBook = (book) => {
-        setTopic(book.topic);
+        setTopic(book.title || book.topic);
         setBook(Array.isArray(book.content) ? book.content : [{ content: book.content }]);
         navigate('/book');
     };
 
     const filteredAndSortedBooks = useMemo(() => {
         return library
-            .filter(book => 
-                book.topic.toLowerCase().includes(searchTerm.toLowerCase())
-            )
+            .filter(book => {
+                const bookTitle = book.title || book.topic; // fallback to topic if title doesn't exist
+                return bookTitle.toLowerCase().includes(searchTerm.toLowerCase());
+            })
             .sort((a, b) => {
+                const getTitleValue = (book) => book.title || book.topic;
                 if (sortBy === 'date') {
                     return sortOrder === 'desc' 
                         ? new Date(b.dateAdded) - new Date(a.dateAdded)
                         : new Date(a.dateAdded) - new Date(b.dateAdded);
                 } else if (sortBy === 'title') {
                     return sortOrder === 'desc'
-                        ? b.topic.localeCompare(a.topic)
-                        : a.topic.localeCompare(b.topic);
+                        ? getTitleValue(b).localeCompare(getTitleValue(a))
+                        : getTitleValue(a).localeCompare(getTitleValue(b));
                 } else if (sortBy === 'pages') {
                     return sortOrder === 'desc'
                         ? (b.content?.length || 0) - (a.content?.length || 0)
