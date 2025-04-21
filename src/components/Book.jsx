@@ -1,39 +1,57 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import BookContext from "./BookContext";
 import styles from "./Book.module.css";
-
-async function fetchBook(topic) {
-    const response = await fetch("http://127.0.0.1:8000/", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*"
-        },
-        body: JSON.stringify(topic)
-    });
-
-    if (!response.ok) {
-        throw new Error(`Failed to generate book: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return JSON.parse(data);
-}
-
-function formatContent(content) {
-    return content
-        .replace(/\*/g, '\n')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-}
+import { LoadingSpinner } from "./common/LoadingSpinner";
+import { Navigation } from "./common/Navigation";
+import { PageContent } from "./common/PageContent";
+import { 
+    fetchBook, 
+    calculateReadingTime, 
+    getUniqueChapters,
+    loadingMessages 
+} from "../utils/bookUtils";
 
 function Book() {
     const navigate = useNavigate();
-    const { topic, book, setBook, addToLibrary } = useContext(BookContext);
-    const [currentPage, setCurrentPage] = useState(0);
+    const { topic, book, setBook, addToLibrary, isDarkMode, toggleTheme } = useContext(BookContext);
+    const [currentPage, setCurrentPage] = useState(() => {
+        const saved = localStorage.getItem(`reading-progress-${topic}`);
+        return saved ? parseInt(saved, 10) : 0;
+    });
     const [isLoading, setIsLoading] = useState(true);
-    const [loadingMessage, setLoadingMessage] = useState('Creating your masterpiece');
+    const [loadingMessage, setLoadingMessage] = useState(loadingMessages[0]);
     const [error, setError] = useState(null);
+    const [fontSize, setFontSize] = useState(() => {
+        const saved = localStorage.getItem('preferred-font-size');
+        return saved ? parseFloat(saved) : 1.1;
+    });
+    const [showChapterList, setShowChapterList] = useState(false);
+
+    // Save reading progress when page changes
+    useEffect(() => {
+        if (topic && currentPage !== undefined) {
+            localStorage.setItem(`reading-progress-${topic}`, currentPage.toString());
+        }
+    }, [currentPage, topic]);
+
+    // Save font size preference when it changes
+    useEffect(() => {
+        localStorage.setItem('preferred-font-size', fontSize.toString());
+    }, [fontSize]);
+
+    useEffect(() => {
+        const handleKeyPress = (e) => {
+            if (e.key === 'ArrowLeft' && currentPage > 0) {
+                setCurrentPage(prev => prev - 1);
+            } else if (e.key === 'ArrowRight' && currentPage < (book?.length || 0) - 1) {
+                setCurrentPage(prev => prev + 1);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyPress);
+        return () => window.removeEventListener('keydown', handleKeyPress);
+    }, [currentPage, book?.length]);
 
     useEffect(() => {
         if (!topic) {
@@ -41,25 +59,16 @@ function Book() {
             return;
         }
 
-        const messages = [
-            'Brewing creative ideas',
-            'Crafting your story',
-            'Weaving magical words',
-            'Adding final touches',
-            'Creating your masterpiece'
-        ];
-
         const messageInterval = setInterval(() => {
             setLoadingMessage(prev => {
-                const currentIndex = messages.indexOf(prev);
-                return messages[(currentIndex + 1) % messages.length];
+                const currentIndex = loadingMessages.indexOf(prev);
+                return loadingMessages[(currentIndex + 1) % loadingMessages.length];
             });
         }, 3000);
 
         if (!book) {
             fetchBook(topic)
                 .then(data => {
-                    // Flatten chapters array for easier navigation
                     const flattenedPages = data.chapters.flatMap(ch => 
                         ch.chapter.map(page => ({
                             title: page.chapter_name,
@@ -80,23 +89,38 @@ function Book() {
         return () => clearInterval(messageInterval);
     }, [topic, book, setBook, addToLibrary, navigate]);
 
-    if (isLoading) {
-        return (
-            <div className={styles.loadingContainer}>
-                <div className={styles.loadingBook}>
-                    <div className={styles.bookPage}></div>
-                    <div className={styles.bookCover}></div>
-                </div>
-                <div className={styles.loadingText}>
-                    {loadingMessage}
-                    <span className={styles.loadingDots}>
-                        <span className={styles.dot}>.</span>
-                        <span className={styles.dot}>.</span>
-                        <span className={styles.dot}>.</span>
-                    </span>
-                </div>
-            </div>
+    const adjustFontSize = (delta) => {
+        setFontSize(prev => Math.min(Math.max(0.8, prev + delta), 1.6));
+    };
+
+    const chapters = useMemo(() => getUniqueChapters(book), [book]);
+
+    const navigateToChapter = (chapterNumber) => {
+        const pageIndex = book.findIndex(page => page.chapter_number === chapterNumber);
+        if (pageIndex !== -1) {
+            setCurrentPage(pageIndex);
+            setShowChapterList(false);
+        }
+    };
+
+    const readingTimeInfo = useMemo(() => {
+        if (!book) return null;
+        
+        const totalMinutes = book.reduce((acc, page) => 
+            acc + calculateReadingTime(page.content), 0
         );
+        const remainingMinutes = book.slice(currentPage).reduce((acc, page) => 
+            acc + calculateReadingTime(page.content), 0
+        );
+        
+        return {
+            total: totalMinutes,
+            remaining: remainingMinutes
+        };
+    }, [book, currentPage]);
+
+    if (isLoading) {
+        return <LoadingSpinner message={loadingMessage} />;
     }
 
     if (error) {
@@ -104,9 +128,7 @@ function Book() {
             <div className={styles.error}>
                 <h2>Oops! Something went wrong</h2>
                 <p>{error}</p>
-                <button className={styles.navButton} onClick={() => navigate('/')}>
-                    Try Again
-                </button>
+                <button className={styles.navButton} onClick={() => navigate('/')}>Try Again</button>
             </div>
         );
     }
@@ -115,48 +137,51 @@ function Book() {
         return (
             <div className={styles.error}>
                 <p>No book content available</p>
-                <button className={styles.navButton} onClick={() => navigate('/')}>
-                    Create New Book
-                </button>
+                <button className={styles.navButton} onClick={() => navigate('/')}>Create New Book</button>
             </div>
         );
     }
     
     return (
-        <div>
+        <div className={isDarkMode ? styles.darkMode : ''}>
+            <Navigation 
+                onHome={() => navigate('/')}
+                onLibrary={() => navigate('/library')}
+                onFontSizeChange={adjustFontSize}
+                onThemeToggle={toggleTheme}
+                isDarkMode={isDarkMode}
+                chapters={chapters}
+                onChapterSelect={navigateToChapter}
+                showChapterList={showChapterList}
+                onChapterListToggle={() => setShowChapterList(!showChapterList)}
+            />
+
             <h1 className={styles.title}>{topic}</h1>
-            <div className={styles.container}>
-                <div className={styles.pageContainer}>
-                    <h3 className={styles.pageTitle}>Chapter {book[currentPage].chapter_number}: {book[currentPage].title}</h3>
-                    <p 
-                        className={styles.pageContent}
-                        dangerouslySetInnerHTML={{ 
-                            __html: formatContent(book[currentPage].content) 
-                        }}
-                    />
-                </div>
-                <div className={styles.navigation}>
-                    <button 
-                        className={styles.navButton}
-                        onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
-                        disabled={currentPage === 0}
-                    >
-                        ← Previous
-                    </button>
-                    <span className={styles.pageNumber}>
-                        Page {currentPage + 1} of {book.length}
+            {readingTimeInfo && (
+                <div className={styles.readingTime}>
+                    <span title="Total reading time">
+                        📚 {readingTimeInfo.total} min total
                     </span>
-                    <button 
-                        className={styles.navButton}
-                        onClick={() => setCurrentPage(prev => Math.min(book.length - 1, prev + 1))}
-                        disabled={currentPage === book.length - 1}
-                    >
-                        Next →
-                    </button>
+                    <span title="Time remaining">
+                        ⏱️ {readingTimeInfo.remaining} min remaining
+                    </span>
                 </div>
+            )}
+            <div className={styles.progressBar}>
+                <div 
+                    className={styles.progressFill} 
+                    style={{ width: `${((currentPage + 1) / book.length) * 100}%` }}
+                />
             </div>
+            
+            <PageContent 
+                currentPage={currentPage}
+                book={book}
+                fontSize={fontSize}
+                onPageChange={setCurrentPage}
+            />
         </div>
     );
 }
 
-export default Book
+export default Book;

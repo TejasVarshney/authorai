@@ -5,6 +5,14 @@ const BookContext = createContext();
 export const BookProvider = ({children}) => {
     const [topic, setTopic] = useState("");
     const [book, setBook] = useState(null);
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        try {
+            const saved = localStorage.getItem('dark-mode');
+            return saved === 'true';
+        } catch {
+            return false;
+        }
+    });
     const [library, setLibrary] = useState(() => {
         try {
             const saved = localStorage.getItem('bookLibrary');
@@ -17,6 +25,11 @@ export const BookProvider = ({children}) => {
     useEffect(() => {
         localStorage.setItem('bookLibrary', JSON.stringify(library));
     }, [library]);
+
+    useEffect(() => {
+        localStorage.setItem('dark-mode', isDarkMode.toString());
+        document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+    }, [isDarkMode]);
 
     const addToLibrary = (newBook) => {
         if (newBook && topic) {
@@ -34,6 +47,10 @@ export const BookProvider = ({children}) => {
         setLibrary(prev => prev.filter(book => book.id !== bookId));
     };
 
+    const toggleTheme = () => {
+        setIsDarkMode(prev => !prev);
+    };
+
     return (
         <BookContext.Provider value={{
             topic,
@@ -42,7 +59,9 @@ export const BookProvider = ({children}) => {
             setBook,
             library,
             addToLibrary,
-            removeFromLibrary
+            removeFromLibrary,
+            isDarkMode,
+            toggleTheme
         }}>
             {children}
         </BookContext.Provider>

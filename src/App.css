@@ -6,10 +6,13 @@
   background-color: #f5f6fa;
 }
 
+:root[data-theme="dark"] {
+  color: #e0e0e0;
+  background-color: #1a1a1a;
+}
+
 #root {
   max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
 
@@ -18,11 +21,59 @@ button {
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: inherit;
+  border: none;
+  background: #34495e;
+  color: white;
+  border-radius: 4px;
+}
+
+button:hover:not(:disabled) {
+  background: #2c3e50;
+}
+
+button:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+}
+
+input, select {
+  border: 2px solid #bdc3c7;
+  border-radius: 4px;
+  font-family: inherit;
+  transition: all 0.3s ease;
 }
 
 button:focus,
 button:focus-visible,
-input:focus {
+input:focus,
+select:focus {
   outline: 2px solid #34495e;
   outline-offset: 2px;
+}
+
+/* Dark mode global styles */
+:root[data-theme="dark"] button {
+  background: #34495e;
+}
+
+:root[data-theme="dark"] button:hover:not(:disabled) {
+  background: #2c3e50;
+}
+
+:root[data-theme="dark"] button:disabled {
+  background: #404040;
+}
+
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] select {
+  background: #2d2d2d;
+  border-color: #404040;
+  color: #e0e0e0;
+}
+
+:root[data-theme="dark"] button:focus,
+:root[data-theme="dark"] button:focus-visible,
+:root[data-theme="dark"] input:focus,
+:root[data-theme="dark"] select:focus {
+  outline-color: #e0e0e0;
 }

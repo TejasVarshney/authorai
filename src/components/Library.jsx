@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import BookContext from "./BookContext";
 import styles from "./Library.module.css";
@@ -14,12 +14,14 @@ function BookCard({ book, onRead, onDelete }) {
                 <button 
                     className={styles.button}
                     onClick={() => onRead(book)}
+                    title="Read this book"
                 >
                     Read Book
                 </button>
                 <button 
                     className={`${styles.button} ${styles.deleteButton}`}
                     onClick={() => onDelete(book.id)}
+                    title="Remove from library"
                 >
                     Delete
                 </button>
@@ -30,24 +32,56 @@ function BookCard({ book, onRead, onDelete }) {
 
 export default function Library() {
     const navigate = useNavigate();
-    const { library, removeFromLibrary, setTopic, setBook } = useContext(BookContext);
+    const { library, removeFromLibrary, setTopic, setBook, isDarkMode, toggleTheme } = useContext(BookContext);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [sortBy, setSortBy] = useState('date');
+    const [sortOrder, setSortOrder] = useState('desc');
 
     const handleReadBook = (book) => {
         setTopic(book.topic);
-        // For older books without flattened structure, we'll keep the old format
-        // For new books, we'll use the flattened pages array
         setBook(Array.isArray(book.content) ? book.content : [{ content: book.content }]);
         navigate('/book');
     };
 
+    const filteredAndSortedBooks = useMemo(() => {
+        return library
+            .filter(book => 
+                book.topic.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+            .sort((a, b) => {
+                if (sortBy === 'date') {
+                    return sortOrder === 'desc' 
+                        ? new Date(b.dateAdded) - new Date(a.dateAdded)
+                        : new Date(a.dateAdded) - new Date(b.dateAdded);
+                } else if (sortBy === 'title') {
+                    return sortOrder === 'desc'
+                        ? b.topic.localeCompare(a.topic)
+                        : a.topic.localeCompare(b.topic);
+                } else if (sortBy === 'pages') {
+                    return sortOrder === 'desc'
+                        ? (b.content?.length || 0) - (a.content?.length || 0)
+                        : (a.content?.length || 0) - (b.content?.length || 0);
+                }
+                return 0;
+            });
+    }, [library, searchTerm, sortBy, sortOrder]);
+
     if (!library.length) {
         return (
-            <div className={styles.container}>
+            <div className={`${styles.container} ${isDarkMode ? styles.darkMode : ''}`}>
+                <button
+                    className={`${styles.button} ${styles.themeButton}`}
+                    onClick={toggleTheme}
+                    title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+                >
+                    {isDarkMode ? '☀️' : '🌙'}
+                </button>
                 <h1 className={styles.title}>Your Library</h1>
                 <p className={styles.empty}>Your library is empty. Generate some books to see them here!</p>
                 <button 
                     className={styles.button}
                     onClick={() => navigate('/')}
+                    title="Create your first book"
                 >
                     Create a Book
                 </button>
@@ -56,10 +90,55 @@ export default function Library() {
     }
 
     return (
-        <div className={styles.container}>
+        <div className={`${styles.container} ${isDarkMode ? styles.darkMode : ''}`}>
+            <nav className={styles.topNav}>
+                <button 
+                    className={styles.button}
+                    onClick={() => navigate('/')}
+                    title="Return to home"
+                >
+                    ← Home
+                </button>
+                <button
+                    className={`${styles.button} ${styles.themeButton}`}
+                    onClick={toggleTheme}
+                    title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+                >
+                    {isDarkMode ? '☀️' : '🌙'}
+                </button>
+            </nav>
             <h1 className={styles.title}>Your Library</h1>
+            <div className={styles.controls}>
+                <input
+                    type="search"
+                    placeholder="Search books..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className={styles.searchInput}
+                    aria-label="Search books"
+                />
+                <div className={styles.sortControls}>
+                    <select 
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                        className={styles.select}
+                        aria-label="Sort by"
+                    >
+                        <option value="date">Date Added</option>
+                        <option value="title">Title</option>
+                        <option value="pages">Pages</option>
+                    </select>
+                    <button
+                        className={`${styles.button} ${styles.sortButton}`}
+                        onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+                        title={`Currently ${sortOrder === 'asc' ? 'ascending' : 'descending'}`}
+                    >
+                        {sortOrder === 'asc' ? '↑' : '↓'}
+                    </button>
+                </div>
+            </div>
             <div className={styles.grid}>
-                {library.map((book) => (
+                {filteredAndSortedBooks.map((book) => (
                     <BookCard
                         key={book.id}
                         book={book}
@@ -68,6 +147,9 @@ export default function Library() {
                     />
                 ))}
             </div>
+            {filteredAndSortedBooks.length === 0 && (
+                <p className={styles.empty}>No books match your search.</p>
+            )}
         </div>
     );
 }

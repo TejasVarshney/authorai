@@ -4,9 +4,49 @@
     padding: 2rem;
 }
 
+.topNav {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.searchInput {
+    flex: 1;
+    min-width: 200px;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+}
+
+.sortControls {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.select {
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    background: white;
+    cursor: pointer;
+}
+
+.sortButton {
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    min-width: 40px;
+}
+
 .title {
     font-size: 2.5rem;
-    color: #2c3e50;
     text-align: center;
     margin-bottom: 2rem;
 }
@@ -35,7 +75,6 @@
 
 .bookTitle {
     font-size: 1.5rem;
-    color: #2c3e50;
     margin-bottom: 1rem;
     text-align: center;
 }
@@ -59,10 +98,7 @@
 }
 
 .button {
-    background: #34495e;
-    color: white;
     padding: 0.8rem 1.5rem;
-    border-radius: 4px;
 }
 
 .deleteButton {
@@ -73,6 +109,40 @@
     background: #c0392b;
 }
 
-.link {
-    text-decoration: none;
+/* Dark mode styles */
+:root[data-theme="dark"] .book {
+    background: #2d2d2d;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+:root[data-theme="dark"] .bookTitle {
+    color: #e0e0e0;
+}
+
+:root[data-theme="dark"] .bookInfo,
+:root[data-theme="dark"] .empty {
+    color: #a0a0a0;
+}
+
+:root[data-theme="dark"] .searchInput {
+    background: #2d2d2d;
+    border-color: #404040;
+    color: #e0e0e0;
+}
+
+:root[data-theme="dark"] .searchInput:focus {
+    border-color: #e0e0e0;
+    box-shadow: 0 0 5px rgba(224, 224, 224, 0.2);
+}
+
+:root[data-theme="dark"] .select {
+    background: #2d2d2d;
+}
+
+:root[data-theme="dark"] .deleteButton {
+    background: #c0392b;
+}
+
+:root[data-theme="dark"] .deleteButton:hover {
+    background: #962d22;
 }
