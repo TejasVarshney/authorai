@@ -1,4 +1,5 @@
 export async function fetchBook(topic) {
+    console.log('API URL:', import.meta.env.VITE_API_URL);
     const response = await fetch(import.meta.env.VITE_API_URL, {
         method: "POST",
         headers: {
